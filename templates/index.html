@@ -9,9 +9,24 @@
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--blue:#1677ff;--red:#ef4444;--green:#22c55e;--bg:#f0f2f5;--card:#fff;--border:#e5e7eb;--text:#1f2937;--muted:#6b7280}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
-.wrap{max-width:1280px;margin:0 auto;padding:16px}
 
-/* 搜索栏 */
+/* ========== 布局 ========== */
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:180px;background:#1a1d24;flex-shrink:0;display:flex;flex-direction:column}
+.main{flex:1;overflow-y:auto;padding:16px;background:var(--bg)}
+
+/* ========== 侧边栏 ========== */
+.logo{padding:20px 16px 12px;font-size:16px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px}
+.logo span{background:var(--blue);color:#fff;padding:2px 8px;border-radius:4px;font-size:12px}
+.side-nav{flex:1;padding:8px 0}
+.side-item{display:flex;align-items:center;gap:10px;padding:12px 20px;color:rgba(255,255,255,.65);cursor:pointer;transition:.15s;font-size:14px;border-left:3px solid transparent}
+.side-item:hover{color:#fff;background:rgba(255,255,255,.06)}
+.side-item.on{color:#fff;background:rgba(22,119,255,.15);border-left-color:var(--blue)}
+.side-item svg{width:18px;height:18px;flex-shrink:0;opacity:.7}
+.side-item.on svg{opacity:1}
+.side-footer{padding:16px;font-size:11px;color:rgba(255,255,255,.3);border-top:1px solid rgba(255,255,255,.08)}
+
+/* ========== 搜索栏 ========== */
 .search-bar{background:var(--card);border-radius:12px;padding:16px 20px;display:flex;gap:12px;align-items:center;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:16px;flex-wrap:wrap}
 .search-bar input{flex:1;min-width:200px;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:15px;outline:none;transition:.2s}
 .search-bar input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(22,119,255,.12)}
@@ -19,166 +34,316 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .btn{padding:10px 28px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;transition:.15s}
 .btn:hover{background:#4096ff}
 .btn:disabled{background:#d1d5db;cursor:not-allowed}
-.btn-sm{padding:6px 16px;font-size:12px}
-.btn-outline{background:transparent;color:var(--blue);border:1px solid var(--blue)}
-.btn-outline:hover{background:rgba(22,119,255,.06)}
 .presets{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
 .preset{padding:5px 14px;border-radius:20px;font-size:12px;border:1px solid var(--border);background:#fff;cursor:pointer;transition:.15s;white-space:nowrap}
 .preset:hover,.preset.on{background:var(--blue);color:#fff;border-color:var(--blue)}
 
-/* 卡片 */
+/* ========== 卡片 ========== */
 .card{background:var(--card);border-radius:12px;padding:20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .card-title{font-size:14px;font-weight:600;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:6px}
 .card-title::before{content:'';display:inline-block;width:3px;height:14px;background:var(--blue);border-radius:2px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.card-header .card-title{margin-bottom:0}
 
-/* 行情头部 */
+/* ========== 行情头部 ========== */
 .quote-header{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
-.quote-name{font-size:28px;font-weight:700}
+.quote-name{font-size:28px;font-weight:700;cursor:pointer}
+.quote-name:hover{color:var(--blue)}
 .quote-code{font-size:13px;color:var(--muted);background:#f3f4f6;padding:2px 10px;border-radius:4px}
 .quote-price{font-size:36px;font-weight:700}
 .quote-change{font-size:16px;font-weight:600;padding:4px 12px;border-radius:6px}
 .up{color:var(--red)}.down{color:var(--green)}
 .bg-up{background:#fef2f2;color:var(--red)}.bg-down{background:#f0fdf4;color:var(--green)}
 
-/* 信息网格 */
-.info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+/* ========== 信息网格 ========== */
+.info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
 .info-item{padding:10px 14px;background:#f9fafb;border-radius:8px}
 .info-label{font-size:12px;color:var(--muted)}
 .info-val{font-size:15px;font-weight:600;margin-top:2px}
 
-/* Tab */
+/* ========== Tab ========== */
 .tabs{display:flex;gap:0;margin-bottom:16px;border-bottom:2px solid var(--border)}
 .tab{padding:10px 20px;font-size:14px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;color:var(--muted);transition:.15s}
 .tab:hover{color:var(--text)}
 .tab.on{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
 
-/* 表格 */
+/* ========== 表格 ========== */
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{padding:10px 12px;text-align:right;background:#fafafa;color:var(--muted);font-weight:500;border-bottom:1px solid var(--border);position:sticky;top:0}
-td{padding:10px 12px;text-align:right;border-bottom:1px solid #f3f4f6}
+th{padding:8px 10px;text-align:right;background:#fafafa;color:var(--muted);font-weight:500;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:1}
+td{padding:8px 10px;text-align:right;border-bottom:1px solid #f3f4f6}
 th:first-child,td:first-child{text-align:left}
 tr:hover td{background:#f9fafb}
 .tag{display:inline-block;padding:2px 10px;border-radius:4px;font-size:12px;font-weight:500}
 .tag-red{background:#fef2f2;color:var(--red)}
 .tag-green{background:#f0fdf4;color:var(--green)}
-.tbl-wrap{max-height:400px;overflow-y:auto;border-radius:8px;border:1px solid var(--border)}
+.tbl-wrap{overflow-y:auto;border-radius:8px;border:1px solid var(--border)}
 
-/* 图表 */
+/* 上证50表格特殊样式 */
+.sz50-tbl .tbl-wrap{max-height:calc(100vh - 200px)}
+.sz50-tbl td.code-cell{text-align:left;font-weight:600}
+.sz50-tbl td.name-cell{text-align:left;cursor:pointer}
+.sz50-tbl td.name-cell:hover{color:var(--blue)}
+.sz50-tbl tr{cursor:pointer}
+.sz50-tbl tr:hover td{background:#eef4ff}
+
+/* ========== 图表 ========== */
 #kchart{width:100%;height:460px}
 
-/* 公司概况 */
+/* ========== 公司概况 ========== */
 .profile-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
 .profile-item{display:flex;gap:8px;font-size:13px}
 .profile-item .label{color:var(--muted);min-width:70px;flex-shrink:0}
 .profile-item .value{color:var(--text);word-break:break-all}
 
-/* 错误 */
+/* ========== 错误/加载 ========== */
 .error{color:var(--red);padding:12px;background:#fef2f2;border-radius:8px;margin-top:8px;display:none}
 .loading{text-align:center;padding:40px;color:var(--muted)}
+.spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-/* 响应式 */
-@media(max-width:768px){
+/* ========== 统计条 ========== */
+.stat-bar{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+.stat-item{font-size:13px;color:var(--muted)}
+.stat-item b{color:var(--text);margin-left:4px}
+.stat-item b.up{color:var(--red)}
+.stat-item b.down{color:var(--green)}
+
+/* ========== 隐藏 ========== */
+.page{display:none}
+.page.active{display:block}
+
+/* ========== 响应式 ========== */
+@media(max-width:900px){
+  .sidebar{width:60px}
+  .side-item span{display:none}
+  .logo span{display:none}
+  .side-footer{display:none}
   .search-bar{flex-direction:column}.presets{margin-left:0;width:100%}
   .quote-price{font-size:28px}.quote-name{font-size:22px}
 }
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="app">
 
-<!-- 搜索栏 -->
-<div class="search-bar">
-  <input id="codeInput" value="sh600519" placeholder="输入代码: sh600519 / sz000001 / 000001.XSHG">
-  <select id="freqSel">
-    <option value="1d">日K</option><option value="1w">周K</option><option value="1M">月K</option>
-    <option value="5m">5分钟</option><option value="15m">15分钟</option><option value="30m">30分钟</option><option value="60m">60分钟</option>
-  </select>
-  <select id="countSel">
-    <option value="30">30根</option><option value="60">60根</option><option value="90">90根</option><option value="120">120根</option>
-  </select>
-  <button class="btn" id="btnQuery" onclick="doQuery()">查  询</button>
-  <div class="presets">
-    <span class="preset on" onclick="pick(this,'sh600519')">贵州茅台</span>
-    <span class="preset" onclick="pick(this,'sh000001')">上证指数</span>
-    <span class="preset" onclick="pick(this,'sz000858')">五粮液</span>
-    <span class="preset" onclick="pick(this,'sz000001')">平安银行</span>
-    <span class="preset" onclick="pick(this,'sz300750')">宁德时代</span>
-    <span class="preset" onclick="pick(this,'sh601318')">中国平安</span>
+<!-- ========== 左侧边栏 ========== -->
+<div class="sidebar">
+  <div class="logo">Ashare <span>Pro</span></div>
+  <div class="side-nav">
+    <div class="side-item on" onclick="switchPage(this,'stock')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 16l4-8 4 4 4-12"/></svg>
+      <span>个股查询</span>
+    </div>
+    <div class="side-item" onclick="switchPage(this,'sz50')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg>
+      <span>上证50指数</span>
+    </div>
+  </div>
+  <div class="side-footer">Ashare 数据接口<br>github.com/mpquant/Ashare</div>
+</div>
+
+<!-- ========== 右侧内容区 ========== -->
+<div class="main">
+
+<!-- ===== PAGE: 个股查询 ===== -->
+<div class="page active" id="page-stock">
+
+  <!-- 搜索栏 -->
+  <div class="search-bar">
+    <input id="codeInput" value="sh600519" placeholder="输入代码: sh600519 / sz000001 / 000001.XSHG">
+    <select id="freqSel">
+      <option value="1d">日K</option><option value="1w">周K</option><option value="1M">月K</option>
+      <option value="5m">5分钟</option><option value="15m">15分钟</option><option value="30m">30分钟</option><option value="60m">60分钟</option>
+    </select>
+    <select id="countSel">
+      <option value="30">30根</option><option value="60">60根</option><option value="90">90根</option><option value="120">120根</option>
+    </select>
+    <button class="btn" id="btnQuery" onclick="doQuery()">查  询</button>
+    <div class="presets">
+      <span class="preset on" onclick="pick(this,'sh600519')">贵州茅台</span>
+      <span class="preset" onclick="pick(this,'sh000001')">上证指数</span>
+      <span class="preset" onclick="pick(this,'sz000858')">五粮液</span>
+      <span class="preset" onclick="pick(this,'sz000001')">平安银行</span>
+      <span class="preset" onclick="pick(this,'sz300750')">宁德时代</span>
+      <span class="preset" onclick="pick(this,'sh601318')">中国平安</span>
+    </div>
+  </div>
+  <div class="error" id="errMsg"></div>
+
+  <!-- 实时行情 -->
+  <div class="card" id="quoteCard" style="display:none">
+    <div class="quote-header">
+      <span class="quote-name" id="qName">--</span>
+      <span class="quote-code" id="qCode">--</span>
+      <span class="quote-price" id="qPrice">--</span>
+      <span class="quote-change" id="qChange">--</span>
+      <span style="font-size:12px;color:var(--muted)" id="qTime">--</span>
+    </div>
+    <div class="info-grid" style="margin-top:16px" id="quoteInfo"></div>
+  </div>
+
+  <!-- K线图 -->
+  <div class="card">
+    <div class="card-title">K线行情</div>
+    <div id="kchart"><div class="loading">点击查询加载数据...</div></div>
+  </div>
+
+  <!-- Tab: 公司概况 / 利润表 / 资产负债 / 现金流量 / 主要指标 -->
+  <div class="card">
+    <div class="tabs">
+      <div class="tab on" onclick="switchTab(this,'profile')">公司概况</div>
+      <div class="tab" onclick="switchTab(this,'income')">利润表</div>
+      <div class="tab" onclick="switchTab(this,'balance')">资产负债</div>
+      <div class="tab" onclick="switchTab(this,'cashflow')">现金流量</div>
+      <div class="tab" onclick="switchTab(this,'indicators')">主要指标</div>
+    </div>
+    <div id="tabContent"><div class="loading">选择查询目标后自动加载...</div></div>
+  </div>
+
+  <!-- 每日行情明细 -->
+  <div class="card">
+    <div class="card-title">每日行情明细</div>
+    <div id="dailyTable"><div class="loading">查询后自动加载...</div></div>
+  </div>
+
+</div>
+
+<!-- ===== PAGE: 上证50指数 ===== -->
+<div class="page" id="page-sz50">
+  <div class="card sz50-tbl">
+    <div class="card-header">
+      <div class="card-title">上证50指数成分股</div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <span id="sz50Update" style="font-size:12px;color:var(--muted)">--</span>
+        <button class="btn btn-sm" onclick="loadSz50()">刷新</button>
+      </div>
+    </div>
+    <div class="stat-bar" id="sz50Stat"></div>
+    <div id="sz50Table"><div class="loading"><span class="spinner"></span>加载中...</div></div>
   </div>
 </div>
-<div class="error" id="errMsg"></div>
 
-<!-- 实时行情 -->
-<div class="card" id="quoteCard" style="display:none">
-  <div class="quote-header">
-    <span class="quote-name" id="qName">--</span>
-    <span class="quote-code" id="qCode">--</span>
-    <span class="quote-price" id="qPrice">--</span>
-    <span class="quote-change" id="qChange">--</span>
-    <span style="font-size:12px;color:var(--muted)" id="qTime">--</span>
-  </div>
-  <div class="info-grid" style="margin-top:16px" id="quoteInfo"></div>
-</div>
-
-<!-- K线图 -->
-<div class="card">
-  <div class="card-title">K线行情</div>
-  <div id="kchart"><div class="loading">点击查询加载数据...</div></div>
-</div>
-
-<!-- Tab: 公司概况 / 利润表 / 资产负债 / 现金流量 / 主要指标 -->
-<div class="card">
-  <div class="tabs">
-    <div class="tab on" onclick="switchTab(this,'profile')">公司概况</div>
-    <div class="tab" onclick="switchTab(this,'income')">利润表</div>
-    <div class="tab" onclick="switchTab(this,'balance')">资产负债</div>
-    <div class="tab" onclick="switchTab(this,'cashflow')">现金流量</div>
-    <div class="tab" onclick="switchTab(this,'indicators')">主要指标</div>
-  </div>
-  <div id="tabContent"><div class="loading">选择查询目标后自动加载...</div></div>
-</div>
-
-<!-- 每日行情明细 -->
-<div class="card">
-  <div class="card-title">每日行情明细</div>
-  <div id="dailyTable"><div class="loading">查询后自动加载...</div></div>
-</div>
-
-</div>
+</div><!-- /main -->
+</div><!-- /app -->
 
 <script>
-const chart = echarts.init(document.getElementById('kchart'));
 let currentCode = 'sh600519';
+let sz50Data = [];
+let chart = null;
 
-function pick(el, code) {
-  document.querySelectorAll('.preset').forEach(p => p.classList.remove('on'));
+/* ========== 侧边栏页面切换 ========== */
+function switchPage(el, page) {
+  document.querySelectorAll('.side-item').forEach(i => i.classList.remove('on'));
   el.classList.add('on');
-  document.getElementById('codeInput').value = code;
-  doQuery();
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  if (page === 'sz50' && !sz50Data.length) loadSz50();
+  if (page === 'stock' && !chart) {
+    chart = echarts.init(document.getElementById('kchart'));
+    window.addEventListener('resize', () => chart && chart.resize());
+  }
 }
 
+/* ========== 工具函数 ========== */
+function fmt(v, d = 2) {
+  if (v == null) return '--';
+  if (Math.abs(v) >= 1e8) return (v / 1e8).toFixed(d) + '亿';
+  if (Math.abs(v) >= 1e4) return (v / 1e4).toFixed(d) + '万';
+  return Number(v).toFixed(d);
+}
+function fmtDate(s) { return s ? s.substring(0, 10) : '--'; }
 function setLoading(on) {
   const btn = document.getElementById('btnQuery');
-  btn.disabled = on;
-  btn.textContent = on ? '加载中...' : '查  询';
+  btn.disabled = on; btn.textContent = on ? '加载中...' : '查  询';
 }
-
 function showError(msg) {
   const el = document.getElementById('errMsg');
   el.textContent = msg; el.style.display = 'block';
   setTimeout(() => el.style.display = 'none', 5000);
 }
 
-function fmt(v, decimals = 2) {
-  if (v == null) return '--';
-  if (Math.abs(v) >= 1e8) return (v / 1e8).toFixed(decimals) + '亿';
-  if (Math.abs(v) >= 1e4) return (v / 1e4).toFixed(decimals) + '万';
-  return Number(v).toFixed(decimals);
+/* ========== 上证50 ========== */
+async function loadSz50() {
+  const el = document.getElementById('sz50Table');
+  el.innerHTML = '<div class="loading"><span class="spinner"></span>加载行情数据...</div>';
+  try {
+    const res = await fetch('/api/sz50');
+    const json = await res.json();
+    if (json.code !== 0) throw new Error(json.msg);
+    sz50Data = json.data;
+    renderSz50(json.data);
+    document.getElementById('sz50Update').textContent = '更新: ' + (json.data[0]?.date || '') + ' ' + (json.data[0]?.time || '');
+  } catch (e) {
+    el.innerHTML = '<div class="loading" style="color:var(--red)">加载失败: ' + e.message + '</div>';
+  }
 }
 
-function fmtDate(s) {
-  if (!s) return '--';
-  return s.substring(0, 10);
+function renderSz50(data) {
+  // 统计条
+  const upCount = data.filter(d => d.change_pct > 0).length;
+  const downCount = data.filter(d => d.change_pct < 0).length;
+  const flatCount = data.filter(d => d.change_pct === 0).length;
+  const avgChg = (data.reduce((s, d) => s + d.change_pct, 0) / data.length).toFixed(2);
+  const totalAmt = data.reduce((s, d) => s + d.amount, 0);
+  document.getElementById('sz50Stat').innerHTML = `
+    <span class="stat-item">共<b>${data.length}</b>只</span>
+    <span class="stat-item">涨<b class="up">${upCount}</b></span>
+    <span class="stat-item">跌<b class="down">${downCount}</b></span>
+    ${flatCount ? `<span class="stat-item">平<b>${flatCount}</b></span>` : ''}
+    <span class="stat-item">均涨幅<b class="${avgChg >= 0 ? 'up' : 'down'}">${avgChg > 0 ? '+' : ''}${avgChg}%</b></span>
+    <span class="stat-item">总成交额<b>${fmt(totalAmt)}</b></span>
+  `;
+
+  // 排序：涨幅降序
+  const sorted = [...data].sort((a, b) => b.change_pct - a.change_pct);
+
+  let html = `<div class="tbl-wrap"><table>
+    <thead><tr>
+      <th>代码</th><th>名称</th><th>最新价</th><th>涨跌额</th><th>涨跌幅</th>
+      <th>今开</th><th>最高</th><th>最低</th><th>昨收</th>
+      <th>振幅</th><th>成交量</th><th>成交额</th>
+    </tr></thead><tbody>`;
+
+  for (const d of sorted) {
+    const cls = d.change >= 0 ? 'up' : 'down';
+    const tagCls = d.change >= 0 ? 'tag-red' : 'tag-green';
+    const sign = d.change >= 0 ? '+' : '';
+    const codeShort = d.code.replace('sh', '').replace('sz', '');
+    html += `<tr onclick="pickFromSz50('${d.code}')" title="点击查看 ${d.name} 详情">
+      <td class="code-cell">${codeShort}</td>
+      <td class="name-cell">${d.name}</td>
+      <td class="${cls}" style="font-weight:600">${d.price.toFixed(2)}</td>
+      <td class="${cls}">${sign}${d.change.toFixed(2)}</td>
+      <td><span class="tag ${tagCls}">${sign}${d.change_pct.toFixed(2)}%</span></td>
+      <td>${d.open.toFixed(2)}</td>
+      <td>${d.high.toFixed(2)}</td>
+      <td>${d.low.toFixed(2)}</td>
+      <td>${d.prev_close.toFixed(2)}</td>
+      <td>${d.amplitude.toFixed(2)}%</td>
+      <td>${fmt(d.volume, 0)}手</td>
+      <td>${fmt(d.amount)}</td>
+    </tr>`;
+  }
+  html += '</tbody></table></div>';
+  document.getElementById('sz50Table').innerHTML = html;
+}
+
+function pickFromSz50(code) {
+  // 切换到个股查询并查询该股票
+  document.getElementById('codeInput').value = code;
+  document.querySelectorAll('.preset').forEach(p => p.classList.remove('on'));
+  const sideItems = document.querySelectorAll('.side-item');
+  switchPage(sideItems[0], 'stock');
+  if (!chart) chart = echarts.init(document.getElementById('kchart'));
+  doQuery();
+}
+
+/* ========== 个股查询 ========== */
+function pick(el, code) {
+  document.querySelectorAll('.preset').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('codeInput').value = code;
+  doQuery();
 }
 
 async function doQuery() {
@@ -190,13 +355,9 @@ async function doQuery() {
   setLoading(true);
   document.getElementById('errMsg').style.display = 'none';
 
-  await Promise.all([
-    loadQuote(code),
-    loadKline(code, freq, count),
-    loadProfile(code),
-  ]);
-  // 默认加载利润表
-  switchTab(document.querySelector('.tab.on'), document.querySelector('.tab.on').onclick.toString().match(/'(\w+)'/)[1]);
+  if (!chart) chart = echarts.init(document.getElementById('kchart'));
+  await Promise.all([loadQuote(code), loadKline(code, freq, count), loadProfile(code)]);
+  switchTab(document.querySelector('.tab.on'), document.querySelector('.tab.on').getAttribute('data-type') || 'profile');
   setLoading(false);
 }
 
@@ -222,9 +383,7 @@ async function loadQuote(code) {
       ['今开', d.open], ['昨收', d.prev_close], ['最高', d.high], ['最低', d.low],
       ['成交量', fmt(d.volume, 0) + '手'], ['成交额', fmt(d.amount)],
     ].map(([l, v]) => `<div class="info-item"><div class="info-label">${l}</div><div class="info-val">${v}</div></div>`).join('');
-  } catch (e) {
-    document.getElementById('quoteCard').style.display = 'none';
-  }
+  } catch (e) { document.getElementById('quoteCard').style.display = 'none'; }
 }
 
 /* K线 */
@@ -246,8 +405,7 @@ async function loadKline(code, freq, count) {
         const k = p.find(s => s.seriesType === 'candlestick');
         if (!k) return '';
         const [o, c, l, h] = k.data;
-        const chg = ((c - o) / o * 100).toFixed(2);
-        return `<b>${k.axisValue}</b><br/>开 ${o} &nbsp; 收 <b style="color:${c>=o?'red':'green'}">${c}</b><br/>高 ${h} &nbsp; 低 ${l}<br/>涨跌 ${chg}%`;
+        return `<b>${k.axisValue}</b><br/>开 ${o} &nbsp; 收 <b style="color:${c>=o?'red':'green'}">${c}</b><br/>高 ${h} &nbsp; 低 ${l}<br/>涨跌 ${((c-o)/o*100).toFixed(2)}%`;
       }},
       grid: [{ left: 65, right: 20, top: 40, height: '55%' }, { left: 65, right: 20, top: '76%', height: '14%' }],
       xAxis: [
@@ -279,8 +437,7 @@ async function loadProfile(code) {
     const res = await fetch('/api/profile?code=' + encodeURIComponent(code));
     const json = await res.json();
     if (json.code !== 0) return;
-    const d = json.data;
-    window._profile = d;
+    window._profile = json.data;
   } catch (e) { window._profile = null; }
 }
 
@@ -288,12 +445,13 @@ async function loadProfile(code) {
 function switchTab(el, type) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
   el.classList.add('on');
+  el.setAttribute('data-type', type);
   loadTabContent(type);
 }
 
 async function loadTabContent(type) {
   const container = document.getElementById('tabContent');
-  container.innerHTML = '<div class="loading">加载中...</div>';
+  container.innerHTML = '<div class="loading"><span class="spinner"></span>加载中...</div>';
 
   if (type === 'profile') {
     const d = window._profile;
@@ -357,24 +515,17 @@ function renderTable(colNames, keys, data) {
     <tbody>${data.map(r => `<tr>${keys.map(k => {
       const v = r[k];
       let cls = '';
-      if (k.includes('YOY') || k.includes('RATIO')) cls = v > 0 ? 'up' : v < 0 ? 'down' : '';
+      if (k.includes('TZ') || k.includes('RATIO')) cls = v > 0 ? 'up' : v < 0 ? 'down' : '';
       return `<td class="${cls}">${fmtCell(v, k)}</td>`;
     }).join('')}</tr>`).join('')}</tbody>
   </table></div>`;
 }
 
-window.addEventListener('resize', () => chart.resize());
-
 /* 每日行情明细表 */
 function renderDailyTable(data) {
   const el = document.getElementById('dailyTable');
   if (!data || !data.length) { el.innerHTML = '<div class="loading">暂无数据</div>'; return; }
-  const fmtVol = v => {
-    if (v >= 1e8) return (v / 1e8).toFixed(2) + '亿';
-    if (v >= 1e4) return (v / 1e4).toFixed(2) + '万';
-    return v.toFixed(0);
-  };
-  let html = `<div class="tbl-wrap"><table>
+  let html = `<div class="tbl-wrap" style="max-height:400px"><table>
     <thead><tr>
       <th>日期</th><th>开盘</th><th>收盘</th><th>最高</th><th>最低</th>
       <th>涨跌额</th><th>涨跌幅</th><th>振幅</th><th>成交量</th>
@@ -389,25 +540,25 @@ function renderDailyTable(data) {
     const cls = isUp ? 'up' : 'down';
     const sign = isUp ? '+' : '';
     html += `<tr>
-      <td>${d.date}</td>
-      <td>${d.open.toFixed(2)}</td>
+      <td>${d.date}</td><td>${d.open.toFixed(2)}</td>
       <td class="${cls}">${d.close.toFixed(2)}</td>
-      <td>${d.high.toFixed(2)}</td>
-      <td>${d.low.toFixed(2)}</td>
+      <td>${d.high.toFixed(2)}</td><td>${d.low.toFixed(2)}</td>
       <td class="${cls}">${sign}${change.toFixed(2)}</td>
-      <td class="${cls}"><span class="tag ${isUp ? 'tag-red' : 'tag-green'}">${sign}${changePct.toFixed(2)}%</span></td>
-      <td>${amplitude.toFixed(2)}%</td>
-      <td>${fmtVol(d.volume)}</td>
+      <td><span class="tag ${isUp ? 'tag-red' : 'tag-green'}">${sign}${changePct.toFixed(2)}%</span></td>
+      <td>${amplitude.toFixed(2)}%</td><td>${fmt(d.volume, 0)}</td>
     </tr>`;
   }
   html += '</tbody></table></div>';
   el.innerHTML = html;
 }
 
-// 回车查询
-document.getElementById('codeInput').addEventListener('keydown', e => { if (e.key === 'Enter') doQuery(); });
-// 页面加载自动查询
-doQuery();
+/* ========== 初始化 ========== */
+document.addEventListener('DOMContentLoaded', () => {
+  chart = echarts.init(document.getElementById('kchart'));
+  window.addEventListener('resize', () => chart && chart.resize());
+  document.getElementById('codeInput').addEventListener('keydown', e => { if (e.key === 'Enter') doQuery(); });
+  doQuery();
+});
 </script>
 </body>
 </html>
