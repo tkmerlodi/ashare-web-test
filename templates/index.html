@@ -58,6 +58,9 @@ th{padding:10px 12px;text-align:right;background:#fafafa;color:var(--muted);font
 td{padding:10px 12px;text-align:right;border-bottom:1px solid #f3f4f6}
 th:first-child,td:first-child{text-align:left}
 tr:hover td{background:#f9fafb}
+.tag{display:inline-block;padding:2px 10px;border-radius:4px;font-size:12px;font-weight:500}
+.tag-red{background:#fef2f2;color:var(--red)}
+.tag-green{background:#f0fdf4;color:var(--green)}
 .tbl-wrap{max-height:400px;overflow-y:auto;border-radius:8px;border:1px solid var(--border)}
 
 /* 图表 */
@@ -133,6 +136,12 @@ tr:hover td{background:#f9fafb}
     <div class="tab" onclick="switchTab(this,'indicators')">主要指标</div>
   </div>
   <div id="tabContent"><div class="loading">选择查询目标后自动加载...</div></div>
+</div>
+
+<!-- 每日行情明细 -->
+<div class="card">
+  <div class="card-title">每日行情明细</div>
+  <div id="dailyTable"><div class="loading">查询后自动加载...</div></div>
 </div>
 
 </div>
@@ -225,6 +234,7 @@ async function loadKline(code, freq, count) {
     const json = await res.json();
     if (json.code !== 0) throw new Error(json.msg);
     const data = json.data;
+    window._klineData = data;
     const dates = data.map(d => d.date);
     const ohlc = data.map(d => [d.open, d.close, d.low, d.high]);
     const vols = data.map(d => d.volume);
@@ -256,8 +266,10 @@ async function loadKline(code, freq, count) {
           xAxisIndex: 1, yAxisIndex: 1 }
       ]
     });
+    renderDailyTable(data);
   } catch (e) {
     chart.setOption({ title: { text: 'K线加载失败: ' + e.message, left: 'center', top: '40%', textStyle: { fontSize: 14, color: '#999' } } });
+    document.getElementById('dailyTable').innerHTML = '<div class="loading">加载失败</div>';
   }
 }
 
@@ -352,6 +364,46 @@ function renderTable(colNames, keys, data) {
 }
 
 window.addEventListener('resize', () => chart.resize());
+
+/* 每日行情明细表 */
+function renderDailyTable(data) {
+  const el = document.getElementById('dailyTable');
+  if (!data || !data.length) { el.innerHTML = '<div class="loading">暂无数据</div>'; return; }
+  const fmtVol = v => {
+    if (v >= 1e8) return (v / 1e8).toFixed(2) + '亿';
+    if (v >= 1e4) return (v / 1e4).toFixed(2) + '万';
+    return v.toFixed(0);
+  };
+  let html = `<div class="tbl-wrap"><table>
+    <thead><tr>
+      <th>日期</th><th>开盘</th><th>收盘</th><th>最高</th><th>最低</th>
+      <th>涨跌额</th><th>涨跌幅</th><th>振幅</th><th>成交量</th>
+    </tr></thead><tbody>`;
+  for (let i = data.length - 1; i >= 0; i--) {
+    const d = data[i];
+    const prev = i > 0 ? data[i - 1].close : d.open;
+    const change = d.close - prev;
+    const changePct = (change / prev * 100);
+    const amplitude = ((d.high - d.low) / prev * 100);
+    const isUp = change >= 0;
+    const cls = isUp ? 'up' : 'down';
+    const sign = isUp ? '+' : '';
+    html += `<tr>
+      <td>${d.date}</td>
+      <td>${d.open.toFixed(2)}</td>
+      <td class="${cls}">${d.close.toFixed(2)}</td>
+      <td>${d.high.toFixed(2)}</td>
+      <td>${d.low.toFixed(2)}</td>
+      <td class="${cls}">${sign}${change.toFixed(2)}</td>
+      <td class="${cls}"><span class="tag ${isUp ? 'tag-red' : 'tag-green'}">${sign}${changePct.toFixed(2)}%</span></td>
+      <td>${amplitude.toFixed(2)}%</td>
+      <td>${fmtVol(d.volume)}</td>
+    </tr>`;
+  }
+  html += '</tbody></table></div>';
+  el.innerHTML = html;
+}
+
 // 回车查询
 document.getElementById('codeInput').addEventListener('keydown', e => { if (e.key === 'Enter') doQuery(); });
 // 页面加载自动查询
