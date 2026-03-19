@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ashare 股票查询</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--blue:#1677ff;--red:#ef4444;--green:#22c55e;--bg:#f0f2f5;--card:#fff;--border:#e5e7eb;--text:#1f2937;--muted:#6b7280}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+.wrap{max-width:1280px;margin:0 auto;padding:16px}
+
+/* 搜索栏 */
+.search-bar{background:var(--card);border-radius:12px;padding:16px 20px;display:flex;gap:12px;align-items:center;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:16px;flex-wrap:wrap}
+.search-bar input{flex:1;min-width:200px;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:15px;outline:none;transition:.2s}
+.search-bar input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(22,119,255,.12)}
+.search-bar select{padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;outline:none;background:#fff}
+.btn{padding:10px 28px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;transition:.15s}
+.btn:hover{background:#4096ff}
+.btn:disabled{background:#d1d5db;cursor:not-allowed}
+.btn-sm{padding:6px 16px;font-size:12px}
+.btn-outline{background:transparent;color:var(--blue);border:1px solid var(--blue)}
+.btn-outline:hover{background:rgba(22,119,255,.06)}
+.presets{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+.preset{padding:5px 14px;border-radius:20px;font-size:12px;border:1px solid var(--border);background:#fff;cursor:pointer;transition:.15s;white-space:nowrap}
+.preset:hover,.preset.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+/* 卡片 */
+.card{background:var(--card);border-radius:12px;padding:20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.card-title{font-size:14px;font-weight:600;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.card-title::before{content:'';display:inline-block;width:3px;height:14px;background:var(--blue);border-radius:2px}
+
+/* 行情头部 */
+.quote-header{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.quote-name{font-size:28px;font-weight:700}
+.quote-code{font-size:13px;color:var(--muted);background:#f3f4f6;padding:2px 10px;border-radius:4px}
+.quote-price{font-size:36px;font-weight:700}
+.quote-change{font-size:16px;font-weight:600;padding:4px 12px;border-radius:6px}
+.up{color:var(--red)}.down{color:var(--green)}
+.bg-up{background:#fef2f2;color:var(--red)}.bg-down{background:#f0fdf4;color:var(--green)}
+
+/* 信息网格 */
+.info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.info-item{padding:10px 14px;background:#f9fafb;border-radius:8px}
+.info-label{font-size:12px;color:var(--muted)}
+.info-val{font-size:15px;font-weight:600;margin-top:2px}
+
+/* Tab */
+.tabs{display:flex;gap:0;margin-bottom:16px;border-bottom:2px solid var(--border)}
+.tab{padding:10px 20px;font-size:14px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;color:var(--muted);transition:.15s}
+.tab:hover{color:var(--text)}
+.tab.on{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
+
+/* 表格 */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{padding:10px 12px;text-align:right;background:#fafafa;color:var(--muted);font-weight:500;border-bottom:1px solid var(--border);position:sticky;top:0}
+td{padding:10px 12px;text-align:right;border-bottom:1px solid #f3f4f6}
+th:first-child,td:first-child{text-align:left}
+tr:hover td{background:#f9fafb}
+.tbl-wrap{max-height:400px;overflow-y:auto;border-radius:8px;border:1px solid var(--border)}
+
+/* 图表 */
+#kchart{width:100%;height:460px}
+
+/* 公司概况 */
+.profile-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.profile-item{display:flex;gap:8px;font-size:13px}
+.profile-item .label{color:var(--muted);min-width:70px;flex-shrink:0}
+.profile-item .value{color:var(--text);word-break:break-all}
+
+/* 错误 */
+.error{color:var(--red);padding:12px;background:#fef2f2;border-radius:8px;margin-top:8px;display:none}
+.loading{text-align:center;padding:40px;color:var(--muted)}
+
+/* 响应式 */
+@media(max-width:768px){
+  .search-bar{flex-direction:column}.presets{margin-left:0;width:100%}
+  .quote-price{font-size:28px}.quote-name{font-size:22px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- 搜索栏 -->
+<div class="search-bar">
+  <input id="codeInput" value="sh600519" placeholder="输入代码: sh600519 / sz000001 / 000001.XSHG">
+  <select id="freqSel">
+    <option value="1d">日K</option><option value="1w">周K</option><option value="1M">月K</option>
+    <option value="5m">5分钟</option><option value="15m">15分钟</option><option value="30m">30分钟</option><option value="60m">60分钟</option>
+  </select>
+  <select id="countSel">
+    <option value="30">30根</option><option value="60">60根</option><option value="90">90根</option><option value="120">120根</option>
+  </select>
+  <button class="btn" id="btnQuery" onclick="doQuery()">查  询</button>
+  <div class="presets">
+    <span class="preset on" onclick="pick(this,'sh600519')">贵州茅台</span>
+    <span class="preset" onclick="pick(this,'sh000001')">上证指数</span>
+    <span class="preset" onclick="pick(this,'sz000858')">五粮液</span>
+    <span class="preset" onclick="pick(this,'sz000001')">平安银行</span>
+    <span class="preset" onclick="pick(this,'sz300750')">宁德时代</span>
+    <span class="preset" onclick="pick(this,'sh601318')">中国平安</span>
+  </div>
+</div>
+<div class="error" id="errMsg"></div>
+
+<!-- 实时行情 -->
+<div class="card" id="quoteCard" style="display:none">
+  <div class="quote-header">
+    <span class="quote-name" id="qName">--</span>
+    <span class="quote-code" id="qCode">--</span>
+    <span class="quote-price" id="qPrice">--</span>
+    <span class="quote-change" id="qChange">--</span>
+    <span style="font-size:12px;color:var(--muted)" id="qTime">--</span>
+  </div>
+  <div class="info-grid" style="margin-top:16px" id="quoteInfo"></div>
+</div>
+
+<!-- K线图 -->
+<div class="card">
+  <div class="card-title">K线行情</div>
+  <div id="kchart"><div class="loading">点击查询加载数据...</div></div>
+</div>
+
+<!-- Tab: 公司概况 / 利润表 / 资产负债 / 现金流量 / 主要指标 -->
+<div class="card">
+  <div class="tabs">
+    <div class="tab on" onclick="switchTab(this,'profile')">公司概况</div>
+    <div class="tab" onclick="switchTab(this,'income')">利润表</div>
+    <div class="tab" onclick="switchTab(this,'balance')">资产负债</div>
+    <div class="tab" onclick="switchTab(this,'cashflow')">现金流量</div>
+    <div class="tab" onclick="switchTab(this,'indicators')">主要指标</div>
+  </div>
+  <div id="tabContent"><div class="loading">选择查询目标后自动加载...</div></div>
+</div>
+
+</div>
+
+<script>
+const chart = echarts.init(document.getElementById('kchart'));
+let currentCode = 'sh600519';
+
+function pick(el, code) {
+  document.querySelectorAll('.preset').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('codeInput').value = code;
+  doQuery();
+}
+
+function setLoading(on) {
+  const btn = document.getElementById('btnQuery');
+  btn.disabled = on;
+  btn.textContent = on ? '加载中...' : '查  询';
+}
+
+function showError(msg) {
+  const el = document.getElementById('errMsg');
+  el.textContent = msg; el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 5000);
+}
+
+function fmt(v, decimals = 2) {
+  if (v == null) return '--';
+  if (Math.abs(v) >= 1e8) return (v / 1e8).toFixed(decimals) + '亿';
+  if (Math.abs(v) >= 1e4) return (v / 1e4).toFixed(decimals) + '万';
+  return Number(v).toFixed(decimals);
+}
+
+function fmtDate(s) {
+  if (!s) return '--';
+  return s.substring(0, 10);
+}
+
+async function doQuery() {
+  const code = document.getElementById('codeInput').value.trim();
+  if (!code) return showError('请输入证券代码');
+  const freq = document.getElementById('freqSel').value;
+  const count = document.getElementById('countSel').value;
+  currentCode = code;
+  setLoading(true);
+  document.getElementById('errMsg').style.display = 'none';
+
+  await Promise.all([
+    loadQuote(code),
+    loadKline(code, freq, count),
+    loadProfile(code),
+  ]);
+  // 默认加载利润表
+  switchTab(document.querySelector('.tab.on'), document.querySelector('.tab.on').onclick.toString().match(/'(\w+)'/)[1]);
+  setLoading(false);
+}
+
+/* 实时行情 */
+async function loadQuote(code) {
+  try {
+    const res = await fetch('/api/realtime?code=' + encodeURIComponent(code));
+    const json = await res.json();
+    if (json.code !== 0) throw new Error(json.msg);
+    const d = json.data;
+    document.getElementById('quoteCard').style.display = '';
+    document.getElementById('qName').textContent = d.name;
+    document.getElementById('qCode').textContent = code;
+    const priceEl = document.getElementById('qPrice');
+    priceEl.textContent = d.price.toFixed(2);
+    priceEl.className = 'quote-price ' + (d.change >= 0 ? 'up' : 'down');
+    const chgEl = document.getElementById('qChange');
+    const sign = d.change >= 0 ? '+' : '';
+    chgEl.textContent = `${sign}${d.change.toFixed(2)}  ${sign}${d.change_pct.toFixed(2)}%`;
+    chgEl.className = 'quote-change ' + (d.change >= 0 ? 'bg-up' : 'bg-down');
+    document.getElementById('qTime').textContent = d.date + ' ' + d.time;
+    document.getElementById('quoteInfo').innerHTML = [
+      ['今开', d.open], ['昨收', d.prev_close], ['最高', d.high], ['最低', d.low],
+      ['成交量', fmt(d.volume, 0) + '手'], ['成交额', fmt(d.amount)],
+    ].map(([l, v]) => `<div class="info-item"><div class="info-label">${l}</div><div class="info-val">${v}</div></div>`).join('');
+  } catch (e) {
+    document.getElementById('quoteCard').style.display = 'none';
+  }
+}
+
+/* K线 */
+async function loadKline(code, freq, count) {
+  try {
+    const res = await fetch(`/api/stock?code=${encodeURIComponent(code)}&frequency=${freq}&count=${count}`);
+    const json = await res.json();
+    if (json.code !== 0) throw new Error(json.msg);
+    const data = json.data;
+    const dates = data.map(d => d.date);
+    const ohlc = data.map(d => [d.open, d.close, d.low, d.high]);
+    const vols = data.map(d => d.volume);
+    const first = data[0].close, last = data[data.length - 1].close;
+    const pct = ((last - first) / first * 100).toFixed(2);
+    chart.setOption({
+      title: { text: `区间涨跌 ${pct}%`, left: 'center', textStyle: { fontSize: 13, fontWeight: 500 } },
+      tooltip: { trigger: 'axis', axisPointer: { type: 'cross' }, formatter: p => {
+        const k = p.find(s => s.seriesType === 'candlestick');
+        if (!k) return '';
+        const [o, c, l, h] = k.data;
+        const chg = ((c - o) / o * 100).toFixed(2);
+        return `<b>${k.axisValue}</b><br/>开 ${o} &nbsp; 收 <b style="color:${c>=o?'red':'green'}">${c}</b><br/>高 ${h} &nbsp; 低 ${l}<br/>涨跌 ${chg}%`;
+      }},
+      grid: [{ left: 65, right: 20, top: 40, height: '55%' }, { left: 65, right: 20, top: '76%', height: '14%' }],
+      xAxis: [
+        { type: 'category', data: dates, gridIndex: 0, axisLabel: { fontSize: 11 }, axisLine: { lineStyle: { color: '#ccc' } } },
+        { type: 'category', data: dates, gridIndex: 1, axisLabel: { show: false }, axisLine: { lineStyle: { color: '#ccc' } } }
+      ],
+      yAxis: [
+        { scale: true, gridIndex: 0, splitLine: { lineStyle: { type: 'dashed', color: '#eee' } }, axisLabel: { fontSize: 11 } },
+        { scale: true, gridIndex: 1, splitLine: { show: false }, axisLabel: { show: false } }
+      ],
+      dataZoom: [{ type: 'inside', xAxisIndex: [0, 1], start: 0, end: 100 }],
+      series: [
+        { name: 'K线', type: 'candlestick', data: ohlc, xAxisIndex: 0, yAxisIndex: 0,
+          itemStyle: { color: '#ef4444', color0: '#22c55e', borderColor: '#ef4444', borderColor0: '#22c55e' } },
+        { name: '成交量', type: 'bar', data: vols.map((v, i) => ({ value: v, itemStyle: { color: data[i].close >= data[i].open ? 'rgba(239,68,68,.5)' : 'rgba(34,197,94,.5)' } })),
+          xAxisIndex: 1, yAxisIndex: 1 }
+      ]
+    });
+  } catch (e) {
+    chart.setOption({ title: { text: 'K线加载失败: ' + e.message, left: 'center', top: '40%', textStyle: { fontSize: 14, color: '#999' } } });
+  }
+}
+
+/* 公司概况 */
+async function loadProfile(code) {
+  try {
+    const res = await fetch('/api/profile?code=' + encodeURIComponent(code));
+    const json = await res.json();
+    if (json.code !== 0) return;
+    const d = json.data;
+    window._profile = d;
+  } catch (e) { window._profile = null; }
+}
+
+/* Tab切换 */
+function switchTab(el, type) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  loadTabContent(type);
+}
+
+async function loadTabContent(type) {
+  const container = document.getElementById('tabContent');
+  container.innerHTML = '<div class="loading">加载中...</div>';
+
+  if (type === 'profile') {
+    const d = window._profile;
+    if (!d) { container.innerHTML = '<div class="loading">暂无公司概况数据</div>'; return; }
+    container.innerHTML = `
+      <div class="profile-grid">
+        ${[['公司简称', d.name], ['证券代码', d.code], ['公司全称', d.full_name], ['所属行业', d.industry],
+           ['所属地区', d.area], ['董事长', d.chairman], ['董秘', d.manager], ['注册资本', d.reg_capital ? fmt(d.reg_capital, 0) : '--'],
+           ['成立日期', d.setup_date], ['公司网站', d.website], ['电子邮箱', d.email]].map(([l, v]) =>
+          `<div class="profile-item"><span class="label">${l}</span><span class="value">${v || '--'}</span></div>`
+        ).join('')}
+      </div>
+      ${d.main_business ? `<div style="margin-top:16px;padding:12px;background:#f9fafb;border-radius:8px;font-size:13px"><b>主营业务：</b>${d.main_business}</div>` : ''}`;
+    return;
+  }
+
+  if (type === 'indicators') {
+    try {
+      const res = await fetch('/api/keyindicators?code=' + encodeURIComponent(currentCode));
+      const json = await res.json();
+      if (json.code !== 0) { container.innerHTML = '<div class="loading">暂无数据</div>'; return; }
+      const cols = ['报告期', '每股收益', 'ROE(%)', '毛利率(%)', '净利率(%)', '总资产周转率', '流动比率', '资产负债率(%)', '营收同比(%)', '净利润同比(%)'];
+      const keys = ['REPORT_DATE', 'EPSJB', 'ROEJQ', 'XSMLL', 'XSJLL', 'TOAZZL', 'LD', 'ZCFZL', 'TOTALOPERATEREVETZ', 'PARENTNETPROFITTZ'];
+      container.innerHTML = renderTable(cols, keys, json.data);
+    } catch (e) { container.innerHTML = '<div class="loading">加载失败</div>'; }
+    return;
+  }
+
+  const labelMap = { income: '利润表', balance: '资产负债表', cashflow: '现金流量表' };
+  const colMap = {
+    income: { cols: ['报告期', '营业收入', '营业成本', '营业利润', '归母净利润', '营收同比(%)', '利润率(%)', '净利同比(%)'],
+      keys: ['REPORT_DATE', 'TOTAL_OPERATE_INCOME', 'OPERATE_COST', 'OPERATE_PROFIT', 'PARENT_NETPROFIT', 'TOI_RATIO', 'OPERATE_PROFIT_RATIO', 'PARENT_NETPROFIT_RATIO'] },
+    balance: { cols: ['报告期', '总资产', '总负债', '股东权益', '货币资金', '存货', '应收账款', '流动比率', '资产负债率(%)'],
+      keys: ['REPORT_DATE', 'TOTAL_ASSETS', 'TOTAL_LIABILITIES', 'TOTAL_EQUITY', 'MONETARYFUNDS', 'INVENTORY', 'ACCOUNTS_RECE', 'CURRENT_RATIO', 'DEBT_ASSET_RATIO'] },
+    cashflow: { cols: ['报告期', '经营活动净额', '投资活动净额', '筹资活动净额', '销售收现', '购建资产支出', '支付员工现金'],
+      keys: ['REPORT_DATE', 'NETCASH_OPERATE', 'NETCASH_INVEST', 'NETCASH_FINANCE', 'SALES_SERVICES', 'CONSTRUCT_LONG_ASSET', 'PAY_STAFF_CASH'] },
+  };
+  const { cols, keys } = colMap[type];
+  try {
+    const res = await fetch(`/api/finance?code=${encodeURIComponent(currentCode)}&type=${type}`);
+    const json = await res.json();
+    if (json.code !== 0) { container.innerHTML = '<div class="loading">暂无' + labelMap[type] + '数据</div>'; return; }
+    container.innerHTML = renderTable(cols, keys, json.data);
+  } catch (e) { container.innerHTML = '<div class="loading">加载失败</div>'; }
+}
+
+function renderTable(colNames, keys, data) {
+  if (!data || !data.length) return '<div class="loading">暂无数据</div>';
+  const isMoney = v => v != null && Math.abs(v) >= 1e6;
+  const fmtCell = (v, k) => {
+    if (v == null) return '--';
+    if (k === 'REPORT_DATE') return fmtDate(v);
+    if (k.includes('RATIO') || k.includes('TZ') || k === 'ROEJQ' || k === 'XSMLL' || k === 'XSJLL' || k === 'ZCFZL' || k === 'LD')
+      return Number(v).toFixed(2);
+    if (k === 'TOTAL_ASSETS_TURN' || k === 'EPSJB') return Number(v).toFixed(4);
+    if (isMoney(v)) return fmt(v);
+    return Number(v).toFixed(2);
+  };
+  return `<div class="tbl-wrap"><table>
+    <thead><tr>${colNames.map(c => `<th>${c}</th>`).join('')}</tr></thead>
+    <tbody>${data.map(r => `<tr>${keys.map(k => {
+      const v = r[k];
+      let cls = '';
+      if (k.includes('YOY') || k.includes('RATIO')) cls = v > 0 ? 'up' : v < 0 ? 'down' : '';
+      return `<td class="${cls}">${fmtCell(v, k)}</td>`;
+    }).join('')}</tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+window.addEventListener('resize', () => chart.resize());
+// 回车查询
+document.getElementById('codeInput').addEventListener('keydown', e => { if (e.key === 'Enter') doQuery(); });
+// 页面加载自动查询
+doQuery();
+</script>
+</body>
+</html>

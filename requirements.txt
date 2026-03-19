@@ -1,0 +1,4 @@
+flask>=2.3
+flask-cors
+pandas
+requests
